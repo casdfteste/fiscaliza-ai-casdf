@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Esquema de Relatoria CAS/DF",
+  "description": "Estrutura técnica baseada na Ficha de Relato v5.0 do CAS/DF",
+  "type": "object",
+  "required": ["identificacao", "processo", "voto"],
+  "properties": {
+    "identificacao": {
+      "type": "object",
+      "properties": {
+        "conselheiro": { "type": "string" },
+        "instituicao": { "type": "string" },
+        "data_visita": { "type": "string", "format": "date" }
+      }
+    },
+    "processo": {
+      "type": "object",
+      "properties": {
+        "assunto": { "enum": ["Inscrição nova", "Inclusão de ação", "Alteração de modalidade", "Acompanhamento anual"] },
+        "modalidade": { "enum": ["Anexo I", "Anexo II", "Anexo III"] }
+      }
+    },
+    "voto": {
+      "type": "object",
+      "properties": {
+        "decisao": { "enum": ["Deferimento", "Indeferimento", "Manutenção", "Cancelamento"] },
+        "fundamentacao": { "type": "string" }
+      }
+    }
+  }
+}
