@@ -1,64 +1,57 @@
-<div class="mb-6 p-4 bg-blue-50 rounded-lg">
-    <label class="block text-sm font-bold text-blue-900 mb-2">📸 Documentação Fotográfica</label>
-    <input type="file" id="inputFoto" accept="image/*" capture="environment" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
-    <p class="text-xs text-gray-500 mt-2">Tire fotos da fachada, acessibilidade e espaços.</p>
-</div>
+<div class="mt-8 p-4 bg-gray-100 rounded-xl border-2 border-blue-900">
+    <h3 class="text-lg font-bold text-blue-900 mb-4 uppercase text-center">Parecer do Relator</h3>
+    
+    <div class="space-y-2 mb-4">
+        <label class="block text-sm font-bold text-gray-700">Voto do Relator:</label>
+        <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center p-2 bg-white border rounded">
+                <input type="radio" name="voto" value="Deferimento" class="mr-2"> Deferimento
+            </label>
+            <label class="flex items-center p-2 bg-white border rounded">
+                <input type="radio" name="voto" value="Indeferimento" class="mr-2"> Indeferimento
+            </label>
+            <label class="flex items-center p-2 bg-white border rounded">
+                <input type="radio" name="voto" value="Manutenção" class="mr-2"> Manutenção
+            </label>
+            <label class="flex items-center p-2 bg-white border rounded">
+                <input type="radio" name="voto" value="Cancelamento" class="mr-2"> Cancelamento
+            </label>
+        </div>
+    </div>
 
-<div class="mb-4">
-    <label class="block text-sm font-bold text-gray-700 flex justify-between">
-        Observações Gerais
-        <button type="button" id="btnVoz" class="text-blue-600 text-xs font-bold">🎤 Falar nota</button>
-    </label>
-    <textarea id="observacoes" rows="4" class="w-full p-2 border rounded mt-1" placeholder="Relate o que você observou na visita..."></textarea>
+    <div class="mb-4">
+        <label class="block text-sm font-bold text-gray-700 flex justify-between">
+            Fundamentação do Voto
+            <button type="button" id="btnVozVoto" class="text-blue-600 text-xs font-bold">🎤 Ditar Fundamentos</button>
+        </label>
+        <textarea id="fundamentacao" rows="4" class="w-full p-2 border rounded mt-1" placeholder="Baseie seu voto nas evidências coletadas..."></textarea>
+    </div>
 </div>
 
 <script type="module">
-    import { db, storage } from './firebase-config.js';
-    import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    // --- LÓGICA DE VOZ (Speech to Text) ---
-    const btnVoz = document.getElementById('btnVoz');
-    const campoObs = document.getElementById('observacoes');
-
+    // ... (Mantenha o código anterior e adicione esta lógica de salvamento)
+    
+    // Lógica de Voz para Fundamentação
+    const btnVozVoto = document.getElementById('btnVozVoto');
+    const campoFund = document.getElementById('fundamentacao');
+    
     if ('webkitSpeechRecognition' in window) {
-        const recognition = new webkitSpeechRecognition();
-        recognition.lang = 'pt-BR';
-        
-        btnVoz.onclick = () => {
-            recognition.start();
-            btnVoz.innerText = "🔴 Ouvindo...";
-        };
-
-        recognition.onresult = (event) => {
-            campoObs.value += event.results[0][0].transcript;
-            btnVoz.innerText = "🎤 Falar nota";
-        };
+        const recognitionVoto = new webkitSpeechRecognition();
+        recognitionVoto.lang = 'pt-BR';
+        btnVozVoto.onclick = () => recognitionVoto.start();
+        recognitionVoto.onresult = (e) => campoFund.value += e.results[0][0].transcript;
     }
 
-    // --- ENVIO DO FORMULÁRIO COM FOTO ---
+    // Atualização do salvamento (incluindo o voto)
     document.getElementById('formFiscalizacao').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const file = document.getElementById('inputFoto').files[0];
-        let fotoUrl = "";
-
-        // 1. Upload da Foto para o Storage
-        if (file) {
-            const storageRef = ref(storage, `fotos/${Date.now()}_${file.name}`);
-            const snapshot = await uploadBytes(storageRef, file);
-            fotoUrl = await getDownloadURL(snapshot.ref);
-        }
-
-        // 2. Salva Dados no Firestore
+        // ... (lógica da foto já criada)
+        const votoSelecionado = document.querySelector('input[name="voto"]:checked')?.value;
+        
         await addDoc(collection(db, "fiscalizacoes"), {
-            conselheiro: document.getElementById('conselheiro').value,
-            instituicao: document.getElementById('instituicao').value,
-            observacoes: campoObs.value,
-            foto_evidencia: fotoUrl,
-            data_visita: new Date().toISOString()
+            // ... (campos anteriores)
+            voto: votoSelecionado,
+            fundamentacao: campoFund.value,
+            data_voto: new Date().toISOString()
         });
-
-        alert("✅ Fiscalização salva com sucesso!");
     });
 </script>
-
