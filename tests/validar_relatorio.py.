@@ -1,0 +1,40 @@
+import jsonschema
+import json
+
+# 1. Este é o Schema que você criou no GitHub (Pasta /schema)
+schema_casdf = {
+    "type": "object",
+    "properties": {
+        "identificacao": {"type": "object"},
+        "processo": {"type": "object"},
+        "voto": {"type": "object"}
+    },
+    "required": ["identificacao", "processo", "voto"]
+}
+
+# 2. Exemplo de dados coletados (Caso: Casa de Deus)
+relatorio_teste = {
+    "identificacao": {
+        "conselheiro": "Adacto Artur Dornas",
+        "instituicao": "Casa de Deus"
+    },
+    "processo": {
+        "assunto": "Alteração de modalidade",
+        "modalidade": "Anexo I"
+    },
+    "voto": {
+        "decisao": "Deferimento",
+        "fundamentacao": "Atende os requisitos"
+    }
+}
+
+# 3. Função de teste
+def validar():
+    try:
+        jsonschema.validate(instance=relatorio_teste, schema=schema_casdf)
+        print("✅ Relatório validado com sucesso! Pronto para o Firebase.")
+    except jsonschema.exceptions.ValidationError as err:
+        print(f"❌ Erro de validação: {err.message}")
+
+if __name__ == "__main__":
+    validar()
