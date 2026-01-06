@@ -1,63 +1,64 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novo Relatório - CAS/DF</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 p-4">
-    <div class="max-w-md mx-auto bg-white p-6 rounded-xl shadow-md">
-        <h2 class="text-xl font-bold text-blue-900 mb-6">Relatoria de Processo</h2>
+<div class="mb-6 p-4 bg-blue-50 rounded-lg">
+    <label class="block text-sm font-bold text-blue-900 mb-2">📸 Documentação Fotográfica</label>
+    <input type="file" id="inputFoto" accept="image/*" capture="environment" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+    <p class="text-xs text-gray-500 mt-2">Tire fotos da fachada, acessibilidade e espaços.</p>
+</div>
+
+<div class="mb-4">
+    <label class="block text-sm font-bold text-gray-700 flex justify-between">
+        Observações Gerais
+        <button type="button" id="btnVoz" class="text-blue-600 text-xs font-bold">🎤 Falar nota</button>
+    </label>
+    <textarea id="observacoes" rows="4" class="w-full p-2 border rounded mt-1" placeholder="Relate o que você observou na visita..."></textarea>
+</div>
+
+<script type="module">
+    import { db, storage } from './firebase-config.js';
+    import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // --- LÓGICA DE VOZ (Speech to Text) ---
+    const btnVoz = document.getElementById('btnVoz');
+    const campoObs = document.getElementById('observacoes');
+
+    if ('webkitSpeechRecognition' in window) {
+        const recognition = new webkitSpeechRecognition();
+        recognition.lang = 'pt-BR';
         
-        <form id="formFiscalizacao">
-            <div class="mb-4">
-                <label class="block text-sm font-bold text-gray-700">Conselheiro(a)</label>
-                <input type="text" id="conselheiro" class="w-full p-2 border rounded mt-1" placeholder="Seu nome" required>
-            </div>
+        btnVoz.onclick = () => {
+            recognition.start();
+            btnVoz.innerText = "🔴 Ouvindo...";
+        };
 
-            <div class="mb-4">
-                <label class="block text-sm font-bold text-gray-700">Instituição</label>
-                <input type="text" id="instituicao" class="w-full p-2 border rounded mt-1" placeholder="Ex: Casa de Deus" required>
-            </div>
+        recognition.onresult = (event) => {
+            campoObs.value += event.results[0][0].transcript;
+            btnVoz.innerText = "🎤 Falar nota";
+        };
+    }
 
-            <div class="mb-4">
-                <label class="block text-sm font-bold text-gray-700">Assunto</label>
-                <select id="assunto" class="w-full p-2 border rounded mt-1">
-                    <option value="inscricao_nova">Pedido de inscrição nova</option>
-                    <option value="inclusao_servico">Inclusão de ação ou serviços</option>
-                    <option value="alteracao_modalidade">Alteração de modalidade (Anexo I)</option>
-                    <option value="acompanhamento_anual">Acompanhamento anual</option>
-                </select>
-            </div>
+    // --- ENVIO DO FORMULÁRIO COM FOTO ---
+    document.getElementById('formFiscalizacao').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const file = document.getElementById('inputFoto').files[0];
+        let fotoUrl = "";
 
-            <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg mt-4 shadow-lg hover:bg-green-700">
-                💾 Salvar Relatório
-            </button>
-        </form>
-    </div>
+        // 1. Upload da Foto para o Storage
+        if (file) {
+            const storageRef = ref(storage, `fotos/${Date.now()}_${file.name}`);
+            const snapshot = await uploadBytes(storageRef, file);
+            fotoUrl = await getDownloadURL(snapshot.ref);
+        }
 
-    <script type="module">
-        import { db } from './firebase-config.js';
-        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        document.getElementById('formFiscalizacao').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            try {
-                const docRef = await addDoc(collection(db, "fiscalizacoes"), {
-                    conselheiro: document.getElementById('conselheiro').value,
-                    instituicao: document.getElementById('instituicao').value,
-                    assunto: document.getElementById('assunto').value,
-                    data_criacao: new Date().toISOString()
-                });
-                alert("✅ Relatório salvo no Firebase! ID: " + docRef.id);
-                window.location.href = 'index.html';
-            } catch (e) {
-                console.error("Erro ao salvar: ", e);
-                alert("❌ Erro ao conectar ao Firebase. Verifique as chaves.");
-            }
+        // 2. Salva Dados no Firestore
+        await addDoc(collection(db, "fiscalizacoes"), {
+            conselheiro: document.getElementById('conselheiro').value,
+            instituicao: document.getElementById('instituicao').value,
+            observacoes: campoObs.value,
+            foto_evidencia: fotoUrl,
+            data_visita: new Date().toISOString()
         });
-    </script>
-</body>
-</html>
+
+        alert("✅ Fiscalização salva com sucesso!");
+    });
+</script>
+
