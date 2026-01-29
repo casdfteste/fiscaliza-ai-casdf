@@ -686,28 +686,58 @@ function removerSecaoSemFoto(body, placeholder) {
  * @param {Array} fotos - Array de objetos de foto
  */
 function inserirTodasFotos(body, fotos) {
-  // Criar mapa de fotos por campo
-  const mapaFotos = {};
+  if (fotos.length === 0) {
+    Logger.log('Nenhuma foto para inserir');
+    return;
+  }
+
+  // Adicionar seção de fotos no final do documento
+  body.appendParagraph(''); // Linha em branco
+
+  const titulo = body.appendParagraph('REGISTROS FOTOGRÁFICOS DA VISITA');
+  titulo.setHeading(DocumentApp.ParagraphHeading.HEADING2);
+  titulo.setBold(true);
+  titulo.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+
+  body.appendParagraph(''); // Linha em branco
+
+  // Inserir cada foto
   fotos.forEach(foto => {
-    mapaFotos[foto.campo] = foto;
-  });
+    try {
+      // Adicionar legenda antes da foto
+      const legenda = body.appendParagraph(foto.legenda + ':');
+      legenda.setBold(true);
 
-  // Processar cada campo de foto
-  CAMPOS_FOTO.forEach((campo, index) => {
-    const placeholder = '{{foto_' + (index + 1) + '}}';
+      // Inserir imagem
+      const image = body.appendImage(foto.blob);
 
-    if (mapaFotos[campo]) {
-      const foto = mapaFotos[campo];
-      const sucesso = inserirFoto(body, placeholder, foto.blob, foto.legenda);
+      // Configurar tamanho mantendo proporção
+      const originalWidth = image.getWidth();
+      const originalHeight = image.getHeight();
 
-      if (!sucesso) {
-        Logger.log('Placeholder não encontrado: ' + placeholder);
+      if (originalWidth > IMAGE_MAX_WIDTH) {
+        const ratio = IMAGE_MAX_WIDTH / originalWidth;
+        image.setWidth(IMAGE_MAX_WIDTH);
+        image.setHeight(originalHeight * ratio);
       }
-    } else {
-      // Remover placeholder de foto não fornecida
-      removerSecaoSemFoto(body, placeholder);
+
+      // Limitar altura máxima
+      if (image.getHeight() > IMAGE_MAX_HEIGHT) {
+        const ratio = IMAGE_MAX_HEIGHT / image.getHeight();
+        image.setHeight(IMAGE_MAX_HEIGHT);
+        image.setWidth(image.getWidth() * ratio);
+      }
+
+      // Linha em branco após a foto
+      body.appendParagraph('');
+
+      Logger.log('✅ Foto inserida no documento: ' + foto.legenda);
+    } catch (error) {
+      Logger.log('❌ Erro ao inserir foto ' + foto.legenda + ': ' + error.message);
     }
   });
+
+  Logger.log('Total de fotos inseridas: ' + fotos.length);
 }
 
 
