@@ -15,8 +15,8 @@ const FORM_ID = "1qwMKiEYcp9nUGJQZGqBInmXZwbUc4djDC4N2HW37GLg";
 // Planilha de Respostas
 const SHEET_ID = "1LuF54HNB_VbRlZMEq3-nmx4HfUXosG_ZcGUW1MxPffI";
 
-// Template do Documento (substituir após upload)
-const TEMPLATE_ID = "SUBSTITUIR_PELO_ID_DO_TEMPLATE";
+// Template do Documento
+const TEMPLATE_ID = "1gmdFgJt7KTfDfnh5gXBrv_mKbn8kjETaei_KcBGgYJ4";
 
 // Email Institucional CAS/DF
 const EMAIL_CASDF = "cas_df@sedes.df.gov.br";
