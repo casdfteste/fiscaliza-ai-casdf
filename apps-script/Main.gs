@@ -47,6 +47,17 @@ function onFormSubmit(e) {
     organizarArquivos(docFile, pdfFile);
     Logger.log('Arquivos organizados na pasta: ' + FOLDER_NAME);
 
+    // 8. Atualizar planilha de controle (se existir)
+    try {
+      if (SHEET_CONTROLE_ID) {
+        const linkRelatorio = pdfFile.getUrl();
+        atualizarStatusRelatorioRecebido(dados.instituicao, dados.conselheiro, linkRelatorio);
+        Logger.log('Planilha de controle atualizada');
+      }
+    } catch (e) {
+      Logger.log('Aviso: Não foi possível atualizar planilha de controle: ' + e.message);
+    }
+
     // Calcular tempo de execução
     const endTime = new Date();
     const tempoExecucao = (endTime - startTime) / 1000;

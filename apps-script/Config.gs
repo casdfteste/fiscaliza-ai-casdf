@@ -54,8 +54,8 @@ const COLOR_CAPTION = "#666666";    // Cinza
 // ========================================
 
 const CAMPOS_FOTO = [
+  '📸 Foto da Fachada/Entrada',
   '📸 Foto da Licença/Laudo (se houver)',
-  '📸 Foto da Fachada/Identificação',
   '📸 Fotos de Acessibilidade',
   '📸 Fotos dos Espaços',
   '📸 Fotos de Atividades',
