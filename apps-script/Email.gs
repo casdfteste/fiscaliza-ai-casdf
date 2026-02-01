@@ -49,8 +49,9 @@ function enviarEmailCASDF(dados, pdfFile, recibo, comprovantePdf) {
   };
 
   if (dados.emailConselheiro && validarEmail(dados.emailConselheiro)) {
-    opcoes.cc = dados.emailConselheiro;
-    opcoes.replyTo = dados.emailConselheiro;
+    // Em modo teste, CC também vai para o admin (nunca para email real)
+    opcoes.cc = MODO_TESTE ? EMAIL_ADMIN : dados.emailConselheiro;
+    opcoes.replyTo = MODO_TESTE ? EMAIL_ADMIN : dados.emailConselheiro;
   }
 
   try {
@@ -79,8 +80,11 @@ function enviarReciboConselheiro(dados, pdfFile, recibo, comprovantePdf) {
   }
   anexos.push(pdfFile.getBlob());
 
+  // Em modo teste, envia para o admin ao invés do conselheiro real
+  const destinatario = MODO_TESTE ? EMAIL_ADMIN : dados.emailConselheiro;
+
   const opcoes = {
-    to: dados.emailConselheiro,
+    to: destinatario,
     subject: assunto,
     htmlBody: htmlBody,
     attachments: anexos,
@@ -90,7 +94,7 @@ function enviarReciboConselheiro(dados, pdfFile, recibo, comprovantePdf) {
 
   try {
     MailApp.sendEmail(opcoes);
-    Logger.log('Recibo enviado para conselheiro: ' + dados.emailConselheiro);
+    Logger.log('Recibo enviado para: ' + destinatario + (MODO_TESTE ? ' (MODO TESTE - original: ' + dados.emailConselheiro + ')' : ''));
   } catch (error) {
     Logger.log('ERRO ao enviar recibo para conselheiro: ' + error.message);
     // Não lança exceção - o email principal já foi enviado
