@@ -122,7 +122,11 @@ function criarNomeArquivo(dados) {
   // Formatar data
   const data = formatarDataArquivo(dados.dataVisita);
 
-  return 'Relatorio_Fiscalizacao_' + instituicao + '_' + data;
+  // Adicionar timestamp HHmmss para unicidade
+  const agora = new Date();
+  const hora = Utilities.formatDate(agora, 'America/Sao_Paulo', 'HHmmss');
+
+  return 'Relatorio_Fiscalizacao_' + instituicao + '_' + data + '_' + hora;
 }
 
 /**

@@ -141,6 +141,52 @@ function log(mensagem) {
 }
 
 /**
+ * Gera número de protocolo sequencial único
+ * Formato: FISC-YYYY-NNNN (ex: FISC-2026-0001)
+ * @returns {string} Número de protocolo
+ */
+function gerarNumeroProtocolo() {
+  const props = PropertiesService.getScriptProperties();
+  const ano = new Date().getFullYear();
+  const chaveAno = RECIBO_PROPERTY_KEY + '_' + ano;
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+
+  try {
+    const contadorAtual = parseInt(props.getProperty(chaveAno) || '0', 10);
+    const novoContador = contadorAtual + 1;
+    props.setProperty(chaveAno, novoContador.toString());
+    return RECIBO_PREFIXO + '-' + ano + '-' + String(novoContador).padStart(4, '0');
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Gera objeto de recibo com protocolo, timestamp e dados da submissão
+ * @param {Object} dados - Dados do formulário
+ * @param {File} pdfFile - Arquivo PDF gerado
+ * @returns {Object} Recibo com protocolo, timestamp e metadados
+ */
+function gerarRecibo(dados, pdfFile) {
+  const agora = new Date();
+  const protocolo = gerarNumeroProtocolo();
+
+  return {
+    protocolo: protocolo,
+    dataHora: Utilities.formatDate(agora, 'America/Sao_Paulo', 'dd/MM/yyyy HH:mm:ss'),
+    dataHoraISO: agora.toISOString(),
+    instituicao: dados.instituicao || '(não informado)',
+    conselheiro: dados.conselheiro || '(não informado)',
+    pdfId: pdfFile.getId(),
+    pdfUrl: pdfFile.getUrl(),
+    pdfNome: pdfFile.getName(),
+    status: 'RECEBIDO'
+  };
+}
+
+/**
  * Verifica se está em horário comercial
  * @returns {boolean} True se em horário comercial
  */

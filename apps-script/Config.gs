@@ -18,11 +18,21 @@ const SHEET_ID = "1LuF54HNB_VbRlZMEq3-nmx4HfUXosG_ZcGUW1MxPffI";
 // Template do Documento
 const TEMPLATE_ID = "1gmdFgJt7KTfDfnh5gXBrv_mKbn8kjETaei_KcBGgYJ4";
 
-// Email Institucional CAS/DF
-const EMAIL_CASDF = "cas_df@sedes.df.gov.br";
+// ========================================
+// MODO DE TESTE
+// ========================================
+// ATENÇÃO: Em modo teste, TODOS os emails vão para EMAIL_ADMIN
+// Para produção: trocar MODO_TESTE para false
+const MODO_TESTE = true;
 
-// Email do Administrador (para notificações de erro)
+// Email Institucional CAS/DF (SÓ USADO QUANDO MODO_TESTE = false)
+const EMAIL_CASDF_PRODUCAO = "cas_df@sedes.df.gov.br";
+
+// Email do Administrador (para testes e notificações de erro)
 const EMAIL_ADMIN = "adactoartur.gestor@gmail.com";
+
+// Email efetivo: em teste vai tudo para o admin
+const EMAIL_CASDF = MODO_TESTE ? EMAIL_ADMIN : EMAIL_CASDF_PRODUCAO;
 
 // Pasta de Destino no Drive
 const FOLDER_NAME = "Relatórios CAS-DF 2026";
@@ -48,6 +58,13 @@ const COLOR_TITLE = "#1a237e";      // Azul escuro
 const COLOR_SUBTITLE = "#283593";   // Azul médio
 const COLOR_TEXT = "#000000";       // Preto
 const COLOR_CAPTION = "#666666";    // Cinza
+
+// ========================================
+// CONFIGURAÇÕES DE RECIBO
+// ========================================
+
+const RECIBO_PREFIXO = 'FISC';
+const RECIBO_PROPERTY_KEY = 'recibo_contador';
 
 // ========================================
 // CAMPOS DE FOTO NO FORMULÁRIO

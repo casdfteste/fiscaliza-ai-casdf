@@ -39,15 +39,15 @@ function onFormSubmit(e) {
     const tamanhoMB = (pdfFile.getSize() / 1024 / 1024).toFixed(2);
     Logger.log('PDF gerado: ' + pdfFile.getName() + ' (' + tamanhoMB + ' MB)');
 
-    // 6. Enviar email
-    enviarEmail(dados, pdfFile);
-    Logger.log('Email enviado para: ' + EMAIL_CASDF);
+    // 6. Gerar recibo com protocolo único
+    const recibo = gerarRecibo(dados, pdfFile);
+    Logger.log('Recibo gerado - Protocolo: ' + recibo.protocolo);
 
-    // 7. Organizar no Drive
-    organizarArquivos(docFile, pdfFile);
-    Logger.log('Arquivos organizados na pasta: ' + FOLDER_NAME);
+    // 7. Gerar comprovante PDF no padrão oficial CAS/DF
+    const comprovantePdf = criarReciboPDF(dados, recibo);
+    Logger.log('Comprovante PDF gerado: ' + comprovantePdf.getName());
 
-    // 8. Atualizar planilha de controle (se existir)
+    // 8. Atualizar planilha de controle ANTES do envio de email
     try {
       if (SHEET_CONTROLE_ID) {
         const linkRelatorio = pdfFile.getUrl();
@@ -58,10 +58,19 @@ function onFormSubmit(e) {
       Logger.log('Aviso: Não foi possível atualizar planilha de controle: ' + e.message);
     }
 
+    // 9. Enviar emails (CAS/DF + comprovante conselheiro)
+    enviarEmail(dados, pdfFile, recibo, comprovantePdf);
+    Logger.log('Emails enviados | Protocolo: ' + recibo.protocolo);
+
+    // 9. Organizar no Drive
+    organizarArquivos(docFile, pdfFile);
+    Logger.log('Arquivos organizados na pasta: ' + FOLDER_NAME);
+
     // Calcular tempo de execução
     const endTime = new Date();
     const tempoExecucao = (endTime - startTime) / 1000;
     Logger.log('Tempo de execução: ' + tempoExecucao + ' segundos');
+    Logger.log('Protocolo: ' + recibo.protocolo);
 
     Logger.log('=== PROCESSAMENTO CONCLUÍDO COM SUCESSO ===');
 
