@@ -416,7 +416,7 @@ function criarTemplateFormatado() {
 }
 
 /**
- * Compõe endereço completo a partir do CEP via API ViaCEP
+ * Compõe endereço completo a partir do CEP via BrasilAPI
  * @param {string} cep - CEP (com ou sem formatação)
  * @param {string} numero - Número do endereço
  * @param {string} complemento - Complemento (sala, bloco, etc.)
@@ -431,29 +431,40 @@ function comporEnderecoPorCEP(cep, numero, complemento) {
     return cep + (numero ? ', ' + numero : '') + (complemento ? ' - ' + complemento : '');
   }
 
-  try {
-    const url = 'https://viacep.com.br/ws/' + cepLimpo + '/json/';
-    const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
-    const dados = JSON.parse(response.getContentText());
+  const cepFormatado = cepLimpo.replace(/^(\d{5})(\d{3})$/, '$1-$2');
+  const fallback = 'CEP ' + cepFormatado + (numero ? ', ' + numero : '') + (complemento ? ' - ' + complemento : '');
 
-    if (dados.erro) {
-      Logger.log('CEP não encontrado: ' + cepLimpo);
-      return cep + (numero ? ', ' + numero : '') + (complemento ? ' - ' + complemento : '');
+  // Tentar BrasilAPI (funciona bem com Apps Script)
+  var apis = [
+    'https://brasilapi.com.br/api/cep/v2/' + cepLimpo,
+    'https://brasilapi.com.br/api/cep/v1/' + cepLimpo
+  ];
+
+  for (var a = 0; a < apis.length; a++) {
+    try {
+      var response = UrlFetchApp.fetch(apis[a], { muteHttpExceptions: true });
+      if (response.getResponseCode() !== 200) continue;
+
+      var dados = JSON.parse(response.getContentText());
+      var partes = [];
+
+      // BrasilAPI usa 'street', 'neighborhood', 'city', 'state'
+      if (dados.street) partes.push(dados.street);
+      if (numero) partes.push(numero);
+      if (complemento) partes.push(complemento);
+      if (dados.neighborhood) partes.push(dados.neighborhood);
+      if (dados.city) partes.push(dados.city + '/' + (dados.state || 'DF'));
+      partes.push('CEP ' + cepFormatado);
+
+      Logger.log('CEP resolvido via ' + apis[a]);
+      return partes.join(', ');
+    } catch (e) {
+      Logger.log('Falha na API ' + apis[a] + ': ' + e.message);
     }
-
-    const partes = [];
-    if (dados.logradouro) partes.push(dados.logradouro);
-    if (numero) partes.push(numero);
-    if (complemento) partes.push(complemento);
-    if (dados.bairro) partes.push(dados.bairro);
-    if (dados.localidade) partes.push(dados.localidade + '/' + (dados.uf || 'DF'));
-    partes.push('CEP ' + cepLimpo.replace(/^(\d{5})(\d{3})$/, '$1-$2'));
-
-    return partes.join(', ');
-  } catch (error) {
-    Logger.log('Erro ao consultar CEP: ' + error.message);
-    return cep + (numero ? ', ' + numero : '') + (complemento ? ' - ' + complemento : '');
   }
+
+  Logger.log('Nenhuma API de CEP respondeu, usando fallback');
+  return fallback;
 }
 
 /**

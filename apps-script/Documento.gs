@@ -77,49 +77,64 @@ function aplicarFormatacao(doc) {
   body.setMarginRight(57);    // ~2cm
 
   // Reconstruir cabeçalho no padrão do papel timbrado oficial CAS/DF
-  const header = doc.getHeader();
-  if (header) {
-    header.clear();
+  var header = doc.getHeader();
+  if (!header) {
+    header = doc.addHeader();
+  }
 
-    // Inserir logo CAS/DF
-    try {
-      const logoBlob = obterLogoBlob();
-      if (logoBlob) {
-        const imgPar = header.appendParagraph('');
-        imgPar.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
-        const img = imgPar.addInlineImage(logoBlob);
-        // Redimensionar logo para caber no cabeçalho (~150px largura)
-        const larguraOriginal = img.getWidth();
-        const alturaOriginal = img.getHeight();
-        const novaLargura = 150;
-        const novaAltura = Math.round(alturaOriginal * (novaLargura / larguraOriginal));
-        img.setWidth(novaLargura);
-        img.setHeight(novaAltura);
-      }
-    } catch (e) {
-      Logger.log('Aviso: não foi possível inserir logo: ' + e.message);
+  // Contar elementos antigos ANTES de adicionar novos
+  var numAntigos = header.getNumChildren();
+
+  // 1. PRIMEIRO: Adicionar novo conteúdo (logo + texto institucional)
+  //    Isso garante que o header nunca fique vazio
+
+  // Inserir logo CAS/DF
+  try {
+    var logoBlob = obterLogoBlob();
+    if (logoBlob) {
+      var imgPar = header.appendParagraph('');
+      imgPar.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+      var img = imgPar.addInlineImage(logoBlob);
+      var larguraOriginal = img.getWidth();
+      var alturaOriginal = img.getHeight();
+      var novaLargura = 150;
+      var novaAltura = Math.round(alturaOriginal * (novaLargura / larguraOriginal));
+      img.setWidth(novaLargura);
+      img.setHeight(novaAltura);
     }
+  } catch (e) {
+    Logger.log('Aviso: não foi possível inserir logo: ' + e.message);
+  }
 
-    const h1 = header.appendParagraph('Governo do Distrito Federal');
-    h1.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
-    h1.setFontSize(10);
-    h1.setForegroundColor('#333333');
+  var h1 = header.appendParagraph('Governo do Distrito Federal');
+  h1.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+  h1.setFontSize(10);
+  h1.setForegroundColor('#333333');
 
-    const h2 = header.appendParagraph('Secretaria de Estado de Desenvolvimento Social do Distrito Federal');
-    h2.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
-    h2.setFontSize(10);
-    h2.setForegroundColor('#333333');
+  var h2 = header.appendParagraph('Secretaria de Estado de Desenvolvimento Social do Distrito Federal');
+  h2.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+  h2.setFontSize(10);
+  h2.setForegroundColor('#333333');
 
-    const h3 = header.appendParagraph('Gabinete');
-    h3.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
-    h3.setFontSize(10);
-    h3.setForegroundColor('#333333');
+  var h3 = header.appendParagraph('Gabinete');
+  h3.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+  h3.setFontSize(10);
+  h3.setForegroundColor('#333333');
 
-    const h4 = header.appendParagraph('Conselho de Assistência Social do Distrito Federal');
-    h4.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
-    h4.setBold(true);
-    h4.setFontSize(10);
-    h4.setForegroundColor('#1a237e');
+  var h4 = header.appendParagraph('Conselho de Assistência Social do Distrito Federal');
+  h4.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+  h4.setBold(true);
+  h4.setFontSize(10);
+  h4.setForegroundColor('#1a237e');
+
+  // 2. DEPOIS: Remover conteúdo antigo do template (tabelas, imagens, parágrafos)
+  //    Os elementos antigos estão nos índices 0 até numAntigos-1
+  for (var i = numAntigos - 1; i >= 0; i--) {
+    try {
+      header.removeChild(header.getChild(i));
+    } catch (e) {
+      Logger.log('Aviso ao remover elemento ' + i + ' do header: ' + e.message);
+    }
   }
 
   // Reconstruir rodapé no padrão do papel timbrado oficial
