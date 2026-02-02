@@ -76,6 +76,28 @@ function aplicarFormatacao(doc) {
   body.setMarginLeft(57);     // ~2cm
   body.setMarginRight(57);    // ~2cm
 
+  // Reconstruir cabeçalho (o template original tem layout quebrado com logos)
+  const header = doc.getHeader();
+  if (header) {
+    header.clear();
+
+    const h1 = header.appendParagraph('CONSELHO DE ASSISTÊNCIA SOCIAL DO DISTRITO FEDERAL');
+    h1.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    h1.setBold(true);
+    h1.setFontSize(12);
+    h1.setForegroundColor('#1a237e');
+
+    const h2 = header.appendParagraph('SEPN Quadra 515 Lote 02 Bloco B, 4º andar - Asa Norte/DF - CEP 70.770-502');
+    h2.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    h2.setFontSize(9);
+    h2.setForegroundColor('#333333');
+
+    const h3 = header.appendParagraph('E-mail: cas_df@sedes.df.gov.br');
+    h3.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    h3.setFontSize(9);
+    h3.setForegroundColor('#333333');
+  }
+
   Logger.log('Formatação aplicada');
 }
 

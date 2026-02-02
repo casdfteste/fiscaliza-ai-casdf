@@ -119,7 +119,33 @@ function mapearCampos(respostas) {
  */
 function obterValor(respostas, nomeCampo) {
   if (respostas[nomeCampo] && respostas[nomeCampo][0]) {
-    return respostas[nomeCampo][0].toString().trim();
+    const valor = respostas[nomeCampo][0];
+
+    // Tratar objetos Date do Google Sheets
+    if (valor instanceof Date) {
+      // Horários no Sheets têm ano 1899 (epoch de tempo)
+      if (valor.getFullYear() === 1899) {
+        return Utilities.formatDate(valor, 'America/Sao_Paulo', 'HH:mm');
+      }
+      return Utilities.formatDate(valor, 'America/Sao_Paulo', 'dd/MM/yyyy');
+    }
+
+    const str = valor.toString().trim();
+
+    // Tratar strings de Date.toString() como "Sun Feb 08 2026 00:00:00 GMT-0300..."
+    if (str.includes('GMT')) {
+      try {
+        const d = new Date(str);
+        if (!isNaN(d.getTime())) {
+          if (d.getFullYear() <= 1899) {
+            return Utilities.formatDate(d, 'America/Sao_Paulo', 'HH:mm');
+          }
+          return Utilities.formatDate(d, 'America/Sao_Paulo', 'dd/MM/yyyy');
+        }
+      } catch (e) {}
+    }
+
+    return str;
   }
   return '';
 }
