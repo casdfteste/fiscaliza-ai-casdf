@@ -2,7 +2,7 @@
  * SISTEMA DE AUTOMAÇÃO DE FISCALIZAÇÃO CAS/DF
  * Arquivo: Config.gs
  * Descrição: Constantes e configurações globais
- * Versão: 1.0
+ * Versão: 2.0
  */
 
 // ========================================

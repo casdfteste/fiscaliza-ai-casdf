@@ -2,7 +2,7 @@
  * SISTEMA DE AUTOMAÇÃO DE FISCALIZAÇÃO CAS/DF
  * Arquivo: Recibo.gs
  * Descrição: Geração de comprovante de recebimento no padrão oficial CAS/DF
- * Versão: 1.0
+ * Versão: 2.0
  */
 
 /**

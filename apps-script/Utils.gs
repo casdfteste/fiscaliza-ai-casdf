@@ -2,7 +2,7 @@
  * SISTEMA DE AUTOMAÇÃO DE FISCALIZAÇÃO CAS/DF
  * Arquivo: Utils.gs
  * Descrição: Funções utilitárias
- * Versão: 1.0
+ * Versão: 2.0
  */
 
 /**
@@ -206,8 +206,8 @@ function emHorarioComercial() {
 function obterVersao() {
   return {
     sistema: 'Sistema de Fiscalização CAS/DF',
-    versao: '1.0.0',
-    dataAtualizacao: '2026-01-28',
+    versao: '2.0.0',
+    dataAtualizacao: '2026-02-02',
     autor: 'Adacto Artur'
   };
 }

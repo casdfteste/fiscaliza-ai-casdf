@@ -2,7 +2,7 @@
  * SISTEMA DE AUTOMAÇÃO DE FISCALIZAÇÃO CAS/DF
  * Arquivo: Main.gs
  * Descrição: Função principal e trigger
- * Versão: 1.0
+ * Versão: 2.0
  */
 
 /**
