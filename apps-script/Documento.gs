@@ -76,29 +76,119 @@ function aplicarFormatacao(doc) {
   body.setMarginLeft(57);     // ~2cm
   body.setMarginRight(57);    // ~2cm
 
-  // Reconstruir cabeçalho (o template original tem layout quebrado com logos)
+  // Reconstruir cabeçalho no padrão do papel timbrado oficial CAS/DF
   const header = doc.getHeader();
   if (header) {
     header.clear();
 
-    const h1 = header.appendParagraph('CONSELHO DE ASSISTÊNCIA SOCIAL DO DISTRITO FEDERAL');
-    h1.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
-    h1.setBold(true);
-    h1.setFontSize(12);
-    h1.setForegroundColor('#1a237e');
+    // Inserir logo CAS/DF
+    try {
+      const logoBlob = obterLogoBlob();
+      if (logoBlob) {
+        const imgPar = header.appendParagraph('');
+        imgPar.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+        const img = imgPar.addInlineImage(logoBlob);
+        // Redimensionar logo para caber no cabeçalho (~150px largura)
+        const larguraOriginal = img.getWidth();
+        const alturaOriginal = img.getHeight();
+        const novaLargura = 150;
+        const novaAltura = Math.round(alturaOriginal * (novaLargura / larguraOriginal));
+        img.setWidth(novaLargura);
+        img.setHeight(novaAltura);
+      }
+    } catch (e) {
+      Logger.log('Aviso: não foi possível inserir logo: ' + e.message);
+    }
 
-    const h2 = header.appendParagraph('SEPN Quadra 515 Lote 02 Bloco B, 4º andar - Asa Norte/DF - CEP 70.770-502');
+    const h1 = header.appendParagraph('Governo do Distrito Federal');
+    h1.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    h1.setFontSize(10);
+    h1.setForegroundColor('#333333');
+
+    const h2 = header.appendParagraph('Secretaria de Estado de Desenvolvimento Social do Distrito Federal');
     h2.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
-    h2.setFontSize(9);
+    h2.setFontSize(10);
     h2.setForegroundColor('#333333');
 
-    const h3 = header.appendParagraph('E-mail: cas_df@sedes.df.gov.br');
+    const h3 = header.appendParagraph('Gabinete');
     h3.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
-    h3.setFontSize(9);
+    h3.setFontSize(10);
     h3.setForegroundColor('#333333');
+
+    const h4 = header.appendParagraph('Conselho de Assistência Social do Distrito Federal');
+    h4.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    h4.setBold(true);
+    h4.setFontSize(10);
+    h4.setForegroundColor('#1a237e');
+  }
+
+  // Reconstruir rodapé no padrão do papel timbrado oficial
+  try {
+    const footer = doc.getFooter() || doc.addFooter();
+    footer.clear();
+
+    const sep = footer.appendParagraph('___________________________________________________________________________');
+    sep.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    sep.setFontSize(8);
+    sep.setForegroundColor('#999999');
+
+    const f1 = footer.appendParagraph('"Brasília - Patrimônio Cultural da Humanidade"');
+    f1.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    f1.setFontSize(8);
+
+    const f2 = footer.appendParagraph('SEPN Quadra 515 Lote 02 Bloco B - Bairro Asa Norte - CEP 70.770-502 – DF');
+    f2.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    f2.setFontSize(8);
+
+    const f3 = footer.appendParagraph('Cas_df@sedes.df.gov.br');
+    f3.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    f3.setFontSize(8);
+
+    const f4 = footer.appendParagraph('3773-7213  3773-7214');
+    f4.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+    f4.setFontSize(8);
+  } catch (e) {
+    Logger.log('Aviso: não foi possível criar rodapé: ' + e.message);
   }
 
   Logger.log('Formatação aplicada');
+}
+
+/**
+ * Obtém blob do logo CAS/DF do Google Drive (faz cache no Drive na primeira vez)
+ * @returns {Blob} Blob da imagem do logo
+ */
+function obterLogoBlob() {
+  const props = PropertiesService.getScriptProperties();
+  const logoFileId = props.getProperty('LOGO_FILE_ID');
+
+  // Tentar usar logo já salvo no Drive
+  if (logoFileId) {
+    try {
+      return DriveApp.getFileById(logoFileId).getBlob();
+    } catch (e) {
+      Logger.log('Logo cache inválido, re-baixando...');
+    }
+  }
+
+  // Baixar logo do GitHub
+  const url = 'https://raw.githubusercontent.com/casdfteste/fiscaliza-ai-casdf/main/assets/logo_casdf.jpeg';
+  const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+
+  if (response.getResponseCode() !== 200) {
+    Logger.log('Não foi possível baixar logo: HTTP ' + response.getResponseCode());
+    return null;
+  }
+
+  const blob = response.getBlob().setName('logo_casdf.jpeg');
+
+  // Salvar no Drive para cache
+  const pasta = obterOuCriarPasta(FOLDER_NAME);
+  const file = pasta.createFile(blob);
+  props.setProperty('LOGO_FILE_ID', file.getId());
+
+  Logger.log('Logo CAS/DF salvo no Drive: ' + file.getId());
+  return file.getBlob();
 }
 
 /**
