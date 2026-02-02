@@ -416,6 +416,47 @@ function criarTemplateFormatado() {
 }
 
 /**
+ * Compõe endereço completo a partir do CEP via API ViaCEP
+ * @param {string} cep - CEP (com ou sem formatação)
+ * @param {string} numero - Número do endereço
+ * @param {string} complemento - Complemento (sala, bloco, etc.)
+ * @returns {string} Endereço completo formatado
+ */
+function comporEnderecoPorCEP(cep, numero, complemento) {
+  if (!cep) return '(endereço não informado)';
+
+  const cepLimpo = cep.replace(/\D/g, '');
+  if (cepLimpo.length !== 8) {
+    Logger.log('CEP inválido: ' + cep);
+    return cep + (numero ? ', ' + numero : '') + (complemento ? ' - ' + complemento : '');
+  }
+
+  try {
+    const url = 'https://viacep.com.br/ws/' + cepLimpo + '/json/';
+    const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+    const dados = JSON.parse(response.getContentText());
+
+    if (dados.erro) {
+      Logger.log('CEP não encontrado: ' + cepLimpo);
+      return cep + (numero ? ', ' + numero : '') + (complemento ? ' - ' + complemento : '');
+    }
+
+    const partes = [];
+    if (dados.logradouro) partes.push(dados.logradouro);
+    if (numero) partes.push(numero);
+    if (complemento) partes.push(complemento);
+    if (dados.bairro) partes.push(dados.bairro);
+    if (dados.localidade) partes.push(dados.localidade + '/' + (dados.uf || 'DF'));
+    partes.push('CEP ' + cepLimpo.replace(/^(\d{5})(\d{3})$/, '$1-$2'));
+
+    return partes.join(', ');
+  } catch (error) {
+    Logger.log('Erro ao consultar CEP: ' + error.message);
+    return cep + (numero ? ', ' + numero : '') + (complemento ? ' - ' + complemento : '');
+  }
+}
+
+/**
  * Adiciona campo formatado ao documento
  */
 function addCampo(body, label, placeholder, negrito) {
