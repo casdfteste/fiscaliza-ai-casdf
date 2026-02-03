@@ -94,7 +94,7 @@ function aplicarFormatacao(doc) {
     if (logoBlob) {
       var imgPar = header.appendParagraph('');
       imgPar.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
-      var img = imgPar.addInlineImage(logoBlob);
+      var img = imgPar.appendInlineImage(logoBlob);
       var larguraOriginal = img.getWidth();
       var alturaOriginal = img.getHeight();
       var novaLargura = 150;
