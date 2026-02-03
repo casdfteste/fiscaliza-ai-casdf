@@ -48,150 +48,152 @@ function criarReciboPDF(dados, recibo) {
   body.appendHorizontalRule();
   body.appendParagraph('');
 
-  // 6. Identificação
-  adicionarCampoBold(body, 'Interessado:', dados.instituicao);
-  adicionarCampoBold(body, 'Conselheiro(a) Relator(a):', dados.conselheiro);
-  adicionarCampoBold(body, 'Assunto:', dados.assuntoTipo);
-  adicionarCampoBold(body, 'Modalidade:', dados.modalidade);
-  if (dados.oferta) {
-    adicionarCampoBold(body, 'Serviço/Oferta:', dados.oferta);
-  }
-  if (dados.anoAcompanhamento) {
-    adicionarCampoBold(body, 'Ano de Acompanhamento:', dados.anoAcompanhamento);
-  }
+  // ========================================
+  // IDENTIFICAÇÃO (campos do formulário)
+  // ========================================
+  adicionarCampoBold(body, 'Nome do(a) Conselheiro(a):', dados.conselheiro);
+  adicionarCampoBold(body, 'Nome da Instituição Fiscalizada:', dados.instituicao);
+  adicionarCampoBold(body, 'Tipo de Processo:', dados.assuntoTipo);
+  adicionarCampoBold(body, 'Modalidade da Inscrição:', dados.modalidade);
+  adicionarCampoBold(body, 'Nome do Serviço/Oferta Fiscalizada:', dados.oferta);
+  adicionarCampoBold(body, 'Ano do acompanhamento:', dados.anoAcompanhamento);
 
   body.appendHorizontalRule();
 
-  // 7. Dados da Visita
-  adicionarSecao(body, '1. DADOS DA VISITA');
-  adicionarCampoBold(body, 'Endereço:', dados.endereco);
+  // ========================================
+  // DADOS DA VISITA
+  // ========================================
+  adicionarSecao(body, 'DADOS DA VISITA');
+  adicionarCampoBold(body, 'Endereço Completo:', dados.endereco);
   adicionarCampoBold(body, 'Data da Visita:', formatarData(dados.dataVisita));
-  adicionarCampoBold(body, 'Horário:', dados.horario);
-  adicionarCampoBold(body, 'Quem recebeu o(a) conselheiro(a):', dados.quemRecebeu);
+  adicionarCampoBold(body, 'Horário da Visita:', dados.horario);
+  adicionarCampoBold(body, 'Quem recebeu o(a) conselheiro(a)?', dados.quemRecebeu);
 
   body.appendHorizontalRule();
 
-  // 8. Documentação
-  adicionarSecao(body, '2. DOCUMENTAÇÃO');
-  adicionarCampoBold(body, 'Licença de Funcionamento/Laudo:', dados.licenca);
-  adicionarCampoBold(body, 'Executada em unidade pública cedida:', dados.unidadePublica);
+  // ========================================
+  // DOCUMENTAÇÃO
+  // ========================================
+  adicionarSecao(body, 'DOCUMENTAÇÃO');
+  adicionarCampoBold(body, 'Licença de Funcionamento ou Laudo Técnico:', dados.licenca);
+  adicionarCampoBold(body, 'É executada em unidade pública cedida?', dados.unidadePublica);
   if (dados.instrumentoCessao) {
-    adicionarCampoBold(body, 'Instrumento jurídico da cessão:', dados.instrumentoCessao);
+    adicionarCampoBold(body, 'Qual o instrumento jurídico da cessão?', dados.instrumentoCessao);
   }
 
   body.appendHorizontalRule();
 
-  // 9. Público-Alvo
-  adicionarSecao(body, '3. PÚBLICO-ALVO');
-  if (dados.publicosAtendidos) {
-    adicionarCampoBold(body, 'Públicos Atendidos:', dados.publicosAtendidos);
+  // ========================================
+  // PÚBLICO-ALVO
+  // ========================================
+  adicionarSecao(body, 'PÚBLICO-ALVO');
+  adicionarCampoBold(body, 'Públicos Atendidos:', dados.publicosAtendidos);
+  adicionarCampoBold(body, 'Formas de Acesso dos Usuários:', dados.formasAcesso);
+  if (dados.registroCDI) {
+    adicionarCampoBold(body, 'Se atende IDOSOS - Registro no CDI/DF?', dados.registroCDI);
   }
-  adicionarCampoBold(body, 'Formas de Acesso:', dados.formasAcesso);
-  if (dados.registroCDI && dados.registroCDI !== 'Não se aplica (não atende idosos)') {
-    adicionarCampoBold(body, 'Registro CDI/DF (Idosos):', dados.registroCDI);
-  }
-  if (dados.registroCDCA && dados.registroCDCA !== 'Não se aplica (não atende crianças/adolescentes)') {
-    adicionarCampoBold(body, 'Registro CDCA/DF (Crianças/Adolescentes):', dados.registroCDCA);
+  if (dados.registroCDCA) {
+    adicionarCampoBold(body, 'Se atende CRIANÇAS/ADOLESCENTES - Registro no CDCA/DF?', dados.registroCDCA);
   }
   if (dados.registrosFamilias) {
-    adicionarCampoBold(body, 'Registros Famílias:', dados.registrosFamilias);
+    adicionarCampoBold(body, 'Se atende FAMÍLIAS - Registros:', dados.registrosFamilias);
   }
 
   body.appendHorizontalRule();
 
-  // 10. Equipe
-  adicionarSecao(body, '4. EQUIPE');
-  adicionarCampoBold(body, 'Nº de Voluntários:', dados.numVoluntarios);
-  adicionarCampoBold(body, 'Nº de Contratados:', dados.numContratados);
-  if (dados.especialidades) {
-    adicionarCampoBold(body, 'Especialidades:', dados.especialidades);
-  }
+  // ========================================
+  // EQUIPE
+  // ========================================
+  adicionarSecao(body, 'EQUIPE DE PROFISSIONAIS');
+  adicionarCampoBold(body, 'Número de Voluntários:', dados.numVoluntarios);
+  adicionarCampoBold(body, 'Número de Contratados:', dados.numContratados);
+  adicionarCampoBold(body, 'Especialidades Presentes na Equipe:', dados.especialidades);
 
   body.appendHorizontalRule();
 
-  // 11. Infraestrutura
-  adicionarSecao(body, '5. INFRAESTRUTURA');
+  // ========================================
+  // INFRAESTRUTURA
+  // ========================================
+  adicionarSecao(body, 'INFRAESTRUTURA');
   adicionarCampoBold(body, 'Tipo de Espaço:', dados.tipoEspaco);
-  if (dados.acessibilidade) {
-    adicionarCampoBold(body, 'Acessibilidade:', dados.acessibilidade);
+  adicionarCampoBold(body, 'Acessibilidade:', dados.acessibilidade);
+  adicionarCampoBold(body, 'Compartilha Espaço com Outros Serviços?', dados.compartilhaEspaco);
+  if (dados.servicosCompartilhados) {
+    adicionarCampoBold(body, 'Quais serviços compartilham o espaço?', dados.servicosCompartilhados);
   }
-  adicionarCampoBold(body, 'Compartilha Espaço:', dados.compartilhaEspaco);
-  if (dados.compartilhaEspaco === 'Sim' && dados.servicosCompartilhados) {
-    adicionarCampoBold(body, 'Serviços que compartilham:', dados.servicosCompartilhados);
-  }
-  adicionarCampoBold(body, 'Adequação do Espaço:', dados.espacoSatisfatorio);
+  adicionarCampoBold(body, 'Adequação do Espaço Físico:', dados.espacoSatisfatorio);
   if (dados.inadequacoesEspaco) {
-    adicionarCampoBold(body, 'Inadequações:', dados.inadequacoesEspaco);
+    adicionarCampoBold(body, 'Descreva as inadequações:', dados.inadequacoesEspaco);
   }
 
   body.appendHorizontalRule();
 
-  // 12. Funcionamento
-  adicionarSecao(body, '6. FUNCIONAMENTO');
-  adicionarCampoBold(body, 'Funciona dezembro a dezembro:', dados.dezembroDezembro);
-  adicionarCampoBold(body, 'Período de recesso/férias:', dados.recesso);
-  if (dados.recesso === 'Sim' && dados.periodoRecesso) {
-    adicionarCampoBold(body, 'Período:', dados.periodoRecesso);
+  // ========================================
+  // FUNCIONAMENTO
+  // ========================================
+  adicionarSecao(body, 'FUNCIONAMENTO');
+  adicionarCampoBold(body, 'Funciona de dezembro a dezembro (ano todo)?', dados.dezembroDezembro);
+  adicionarCampoBold(body, 'Há período de recesso ou férias coletivas?', dados.recesso);
+  if (dados.periodoRecesso) {
+    adicionarCampoBold(body, 'Qual o período de recesso/férias?', dados.periodoRecesso);
   }
-  adicionarCampoBold(body, 'Serviço gratuito:', dados.gratuidade);
-  if (dados.gratuidade && dados.gratuidade.indexOf('Não') >= 0 && dados.justificativaNaoGratuito) {
-    adicionarCampoBold(body, 'Justificativa:', dados.justificativaNaoGratuito);
+  adicionarCampoBold(body, 'O serviço é totalmente gratuito?', dados.gratuidade);
+  if (dados.justificativaNaoGratuito) {
+    adicionarCampoBold(body, 'Por que o serviço não é gratuito?', dados.justificativaNaoGratuito);
   }
-  adicionarCampoBold(body, 'Retenção de BPC:', dados.bpc);
-  if (dados.bpc === 'Sim' && dados.percentualBPC) {
-    adicionarCampoBold(body, 'Percentual retido:', dados.percentualBPC);
+  adicionarCampoBold(body, 'Há retenção de BPC?', dados.bpc);
+  if (dados.percentualBPC) {
+    adicionarCampoBold(body, 'Qual o percentual de BPC retido?', dados.percentualBPC);
   }
 
   body.appendHorizontalRule();
 
-  // 13. Articulação com a Rede
-  adicionarSecao(body, '7. ARTICULAÇÃO COM A REDE');
-  adicionarCampoBold(body, 'CRAS:', dados.articulacaoCRAS);
-  adicionarCampoBold(body, 'CREAS:', dados.articulacaoCREAS);
-  if (dados.articulacaoAcolhimento && dados.articulacaoAcolhimento !== 'Não se aplica') {
-    adicionarCampoBold(body, 'Unidade de Acolhimento:', dados.articulacaoAcolhimento);
-  }
-  if (dados.articulacaoAbordagem && dados.articulacaoAbordagem !== 'Não se aplica') {
-    adicionarCampoBold(body, 'Abordagem Social:', dados.articulacaoAbordagem);
-  }
-  if (dados.articulacaoPOP && dados.articulacaoPOP !== 'Não se aplica') {
-    adicionarCampoBold(body, 'Centro POP:', dados.articulacaoPOP);
-  }
+  // ========================================
+  // ARTICULAÇÃO COM A REDE
+  // ========================================
+  adicionarSecao(body, 'ARTICULAÇÃO COM A REDE SETORIAL SUAS');
+  adicionarCampoBold(body, 'Centro de Referência - CRAS:', dados.articulacaoCRAS);
+  adicionarCampoBold(body, 'Centro de Referência Especializado - CREAS:', dados.articulacaoCREAS);
+  adicionarCampoBold(body, 'Unidade de Acolhimento:', dados.articulacaoAcolhimento);
+  adicionarCampoBold(body, 'Serviço de Abordagem Social:', dados.articulacaoAbordagem);
+  adicionarCampoBold(body, 'Centro POP:', dados.articulacaoPOP);
   adicionarCampoBold(body, 'Serviços de Saúde:', dados.articulacaoSaude);
   adicionarCampoBold(body, 'Serviços de Educação:', dados.articulacaoEducacao);
   adicionarCampoBold(body, 'Sistema de Justiça:', dados.articulacaoJustica);
   adicionarCampoBold(body, 'Conselhos de Políticas Públicas:', dados.articulacaoConselhos);
   if (dados.articulacao) {
-    adicionarCampoBold(body, 'Outras Articulações:', dados.articulacao);
+    adicionarCampoBold(body, 'Outras Articulações Relevantes:', dados.articulacao);
   }
 
   body.appendHorizontalRule();
 
-  // 14. Avaliação
-  adicionarSecao(body, '8. AVALIAÇÃO');
-  adicionarCampoBold(body, 'Ações conforme Plano de Trabalho:', dados.acoesPlano);
+  // ========================================
+  // AVALIAÇÃO
+  // ========================================
+  adicionarSecao(body, 'AVALIAÇÃO');
+  adicionarCampoBold(body, 'As ações executadas estão conforme o Plano de Trabalho?', dados.acoesPlano);
   if (dados.divergenciasPlano) {
-    adicionarCampoBold(body, 'Divergências:', dados.divergenciasPlano);
+    adicionarCampoBold(body, 'Descreva as divergências encontradas:', dados.divergenciasPlano);
   }
-  adicionarCampoBold(body, 'Metodologia adequada às normativas:', dados.metodologia);
+  adicionarCampoBold(body, 'A metodologia está adequada às normativas?', dados.metodologia);
   if (dados.inadequacoesMetodologia) {
-    adicionarCampoBold(body, 'Inadequações/Ressalvas:', dados.inadequacoesMetodologia);
+    adicionarCampoBold(body, 'Descreva as inadequações ou ressalvas metodológicas:', dados.inadequacoesMetodologia);
   }
-  if (dados.observacoes) {
-    adicionarCampoBold(body, 'Observações Adicionais:', dados.observacoes);
-  }
+  adicionarCampoBold(body, 'Observações Adicionais:', dados.observacoes);
 
   body.appendHorizontalRule();
 
-  // 15. Voto
-  adicionarSecao(body, '9. DO VOTO');
+  // ========================================
+  // DO VOTO
+  // ========================================
+  adicionarSecao(body, 'DO VOTO');
   adicionarCampoBold(body, 'Quanto às análises técnicas da Secretaria Executiva:', dados.analiseTecnica);
   if (dados.fundamentosDiscordancia) {
     adicionarCampoBold(body, 'Fundamentos da discordância:', dados.fundamentosDiscordancia);
   }
 
   body.appendParagraph('');
-  const labelVoto = body.appendParagraph('O(A) Conselheiro(a) vota pelo(a):');
+  const labelVoto = body.appendParagraph('Voto do(a) Conselheiro(a):');
   labelVoto.setBold(true);
   const textoVoto = body.appendParagraph(dados.voto || '(não informado)');
   textoVoto.setBold(true);
@@ -200,7 +202,7 @@ function criarReciboPDF(dados, recibo) {
 
   if (dados.justificativaVoto) {
     body.appendParagraph('');
-    adicionarCampoBold(body, 'Justificativa:', dados.justificativaVoto);
+    adicionarCampoBold(body, 'Justificativa do Voto:', dados.justificativaVoto);
   }
 
   body.appendParagraph('');
@@ -251,22 +253,44 @@ function criarReciboPDF(dados, recibo) {
 function montarCabecalhoOficial(doc) {
   const header = doc.addHeader();
 
+  // Inserir logo CAS/DF
+  try {
+    var logoBlob = obterLogoBlob();
+    if (logoBlob) {
+      var imgPar = header.appendParagraph('');
+      imgPar.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+      var img = imgPar.appendInlineImage(logoBlob);
+      var larguraOriginal = img.getWidth();
+      var alturaOriginal = img.getHeight();
+      var novaLargura = 150;
+      var novaAltura = Math.round(alturaOriginal * (novaLargura / larguraOriginal));
+      img.setWidth(novaLargura);
+      img.setHeight(novaAltura);
+    }
+  } catch (e) {
+    Logger.log('Aviso: logo no comprovante: ' + e.message);
+  }
+
   const linha1 = header.appendParagraph('Governo do Distrito Federal');
   linha1.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
   linha1.setFontSize(10);
+  linha1.setForegroundColor('#333333');
 
   const linha2 = header.appendParagraph('Secretaria de Estado de Desenvolvimento Social do Distrito Federal');
   linha2.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
   linha2.setFontSize(10);
+  linha2.setForegroundColor('#333333');
 
   const linha3 = header.appendParagraph('Gabinete');
   linha3.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
   linha3.setFontSize(10);
+  linha3.setForegroundColor('#333333');
 
   const linha4 = header.appendParagraph('Conselho de Assistência Social do Distrito Federal');
   linha4.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
   linha4.setBold(true);
   linha4.setFontSize(10);
+  linha4.setForegroundColor('#1a237e');
 }
 
 /**

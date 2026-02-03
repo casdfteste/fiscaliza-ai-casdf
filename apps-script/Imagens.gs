@@ -12,6 +12,8 @@
  */
 function processarFotos(respostas) {
   const fotos = [];
+  var totalOriginal = 0;
+  var totalComprimido = 0;
 
   CAMPOS_FOTO.forEach(campo => {
     if (respostas[campo] && respostas[campo][0]) {
@@ -21,26 +23,144 @@ function processarFotos(respostas) {
       if (fileId) {
         try {
           const file = DriveApp.getFileById(fileId);
-          const blob = file.getBlob();
+          const tamanhoOriginal = file.getSize();
+          totalOriginal += tamanhoOriginal;
+
+          // Comprimir imagem (passa fileId para fallback via thumbnail)
+          const blobComprimido = comprimirImagem(file, campo, fileId);
+          const tamanhoFinal = blobComprimido.getBytes().length;
+          totalComprimido += tamanhoFinal;
+
+          var economia = Math.round((1 - tamanhoFinal / tamanhoOriginal) * 100);
+          if (economia < 0) economia = 0;
 
           fotos.push({
             campo: campo,
             fileId: fileId,
-            blob: blob,
-            legenda: campo.replace('📸 ', ''),
+            blob: blobComprimido,
+            legenda: campo,
             nome: file.getName(),
-            tamanho: file.getSize()
+            tamanho: tamanhoFinal
           });
 
-          Logger.log('✅ Foto processada: ' + campo);
+          Logger.log('Foto processada: ' + campo +
+            ' | Original: ' + formatarTamanho_(tamanhoOriginal) +
+            ' -> Comprimido: ' + formatarTamanho_(tamanhoFinal) +
+            ' (' + economia + '% reducao)');
         } catch (error) {
-          Logger.log('⚠️ Erro ao processar foto "' + campo + '": ' + error.message);
+          Logger.log('Erro ao processar foto "' + campo + '": ' + error.message);
         }
       }
     }
   });
 
+  Logger.log('Resumo compressao: ' +
+    formatarTamanho_(totalOriginal) + ' -> ' + formatarTamanho_(totalComprimido) +
+    ' (economia total: ' + formatarTamanho_(totalOriginal - totalComprimido) + ')');
+
   return fotos;
+}
+
+/**
+ * Comprime uma imagem convertendo para JPEG e redimensionando se necessário
+ * @param {File} file - Arquivo da imagem no Drive
+ * @param {string} campo - Nome do campo (para log)
+ * @param {string} fileId - ID do arquivo no Drive
+ * @returns {Blob} Imagem comprimida
+ */
+function comprimirImagem(file, campo, fileId) {
+  try {
+    var blob = file.getBlob();
+    var mimeType = blob.getContentType();
+    var blobProcessado = blob;
+
+    // Converter para JPEG se não for (PNG, HEIC, WEBP -> JPEG reduz muito)
+    if (mimeType !== 'image/jpeg' && mimeType !== 'image/jpg') {
+      try {
+        blobProcessado = blob.getAs('image/jpeg');
+        Logger.log('Convertido para JPEG: ' + campo + ' (' + mimeType + ' -> image/jpeg)');
+      } catch (convErr) {
+        Logger.log('Falha na conversao JPEG de ' + campo + ': ' + convErr.message);
+      }
+    }
+
+    // Verificar tamanho - usar file.getSize() como referência
+    var tamanho = file.getSize();
+    if (tamanho > MAX_FOTO_BYTES) {
+      Logger.log('Foto grande (' + formatarTamanho_(tamanho) + '), tentando thumbnail: ' + campo);
+
+      // Tentar obter versão redimensionada via Drive thumbnail
+      var thumbnail = obterThumbnailDrive_(fileId);
+      if (thumbnail) {
+        Logger.log('Thumbnail obtido para ' + campo + ': ' + formatarTamanho_(thumbnail.getBytes().length));
+        return thumbnail;
+      }
+
+      // Fallback: forçar conversão JPEG (pode reduzir PNGs e HEICs)
+      try {
+        blobProcessado = file.getAs('image/jpeg');
+      } catch (e2) {
+        Logger.log('Fallback JPEG falhou: ' + e2.message);
+      }
+    }
+
+    return blobProcessado;
+  } catch (error) {
+    Logger.log('Erro na compressao de "' + campo + '": ' + error.message + ' - usando original');
+    return file.getBlob();
+  }
+}
+
+/**
+ * Obtém versão redimensionada da imagem via Google Drive thumbnail
+ * @param {string} fileId - ID do arquivo no Drive
+ * @returns {Blob|null} Blob redimensionado ou null
+ */
+function obterThumbnailDrive_(fileId) {
+  // Tentar diferentes URLs de thumbnail do Google Drive
+  var urls = [
+    'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w800',
+    'https://lh3.googleusercontent.com/d/' + fileId + '=w800'
+  ];
+
+  var token = ScriptApp.getOAuthToken();
+
+  for (var i = 0; i < urls.length; i++) {
+    try {
+      var response = UrlFetchApp.fetch(urls[i], {
+        headers: { 'Authorization': 'Bearer ' + token },
+        muteHttpExceptions: true,
+        followRedirects: true
+      });
+
+      if (response.getResponseCode() === 200) {
+        var contentType = response.getHeaders()['Content-Type'] || '';
+        if (contentType.indexOf('image') >= 0) {
+          var thumbBlob = response.getBlob().setName('foto_' + fileId + '.jpeg');
+          Logger.log('Thumbnail via URL ' + (i + 1) + ' OK: ' + formatarTamanho_(thumbBlob.getBytes().length));
+          return thumbBlob;
+        }
+      }
+    } catch (e) {
+      Logger.log('Thumbnail URL ' + (i + 1) + ' falhou: ' + e.message);
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Formata tamanho em bytes para exibição legível
+ * @param {number} bytes - Tamanho em bytes
+ * @returns {string} Tamanho formatado (ex: "1.5 MB", "800 KB")
+ */
+function formatarTamanho_(bytes) {
+  if (bytes >= 1048576) {
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  } else if (bytes >= 1024) {
+    return (bytes / 1024).toFixed(0) + ' KB';
+  }
+  return bytes + ' B';
 }
 
 /**
@@ -201,9 +321,9 @@ function inserirTodasFotos(body, fotos) {
       // Linha em branco após a foto
       body.appendParagraph('');
 
-      Logger.log('✅ Foto inserida no documento: ' + foto.legenda);
+      Logger.log('Foto inserida no documento: ' + foto.legenda);
     } catch (error) {
-      Logger.log('❌ Erro ao inserir foto ' + foto.legenda + ': ' + error.message);
+      Logger.log('Erro ao inserir foto ' + foto.legenda + ': ' + error.message);
     }
   });
 

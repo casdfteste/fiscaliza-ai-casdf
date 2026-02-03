@@ -84,6 +84,68 @@ function onFormSubmit(e) {
 }
 
 /**
+ * Atualiza a planilha de controle quando um relatório é recebido
+ * @param {string} instituicao - Nome da instituição
+ * @param {string} conselheiro - Nome do conselheiro
+ * @param {string} linkRelatorio - URL do relatório PDF
+ */
+function atualizarStatusRelatorioRecebido(instituicao, conselheiro, linkRelatorio) {
+  if (!SHEET_CONTROLE_ID) return;
+
+  var ss = SpreadsheetApp.openById(SHEET_CONTROLE_ID);
+  var sheet = ss.getSheetByName(ABA_CONTROLE);
+  if (!sheet) {
+    Logger.log('Aba "' + ABA_CONTROLE + '" nao encontrada na planilha de controle');
+    return;
+  }
+
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0];
+
+  // Localizar colunas relevantes (busca flexível)
+  var colEntidade = -1, colStatus = -1, colLink = -1, colData = -1, colSituacao = -1;
+  for (var c = 0; c < headers.length; c++) {
+    var h = headers[c].toString().toLowerCase();
+    if (h.indexOf('entidade') >= 0 || h.indexOf('institui') >= 0) colEntidade = c;
+    if (h === 'status') colStatus = c;
+    if (h.indexOf('link') >= 0 && h.indexOf('relat') >= 0) colLink = c;
+    if (h.indexOf('data') >= 0 && h.indexOf('receb') >= 0) colData = c;
+    if (h.indexOf('situa') >= 0 && h.indexOf('prazo') >= 0) colSituacao = c;
+  }
+
+  if (colEntidade === -1) {
+    Logger.log('Coluna de entidade nao encontrada na planilha de controle');
+    return;
+  }
+
+  // Buscar linha da instituição (mais recente primeiro)
+  for (var i = data.length - 1; i >= 1; i--) {
+    var valor = data[i][colEntidade] ? data[i][colEntidade].toString() : '';
+    if (valor && valor.toLowerCase().indexOf(instituicao.toLowerCase()) >= 0) {
+      var row = i + 1; // Converter para 1-based
+
+      if (colStatus >= 0) {
+        sheet.getRange(row, colStatus + 1).setValue(STATUS.RECEBIDO);
+      }
+      if (colLink >= 0 && linkRelatorio) {
+        sheet.getRange(row, colLink + 1).setValue(linkRelatorio);
+      }
+      if (colData >= 0) {
+        sheet.getRange(row, colData + 1).setValue(new Date());
+      }
+      if (colSituacao >= 0) {
+        sheet.getRange(row, colSituacao + 1).setValue(SITUACAO_PRAZO.CONCLUIDO);
+      }
+
+      Logger.log('Planilha de controle atualizada - Linha ' + row + ': ' + instituicao);
+      return;
+    }
+  }
+
+  Logger.log('Instituicao "' + instituicao + '" nao encontrada na planilha de controle');
+}
+
+/**
  * Instala o trigger para o formulário
  * Executar manualmente uma vez após configuração
  */

@@ -76,6 +76,33 @@ function aplicarFormatacao(doc) {
   body.setMarginLeft(57);     // ~2cm
   body.setMarginRight(57);    // ~2cm
 
+  // Remover tabela de branding antiga e texto de versão do body do template
+  // O template tem uma tabela com 3 colunas (logos + texto institucional) que
+  // renderiza como texto vertical. Precisa ser removida do body.
+  var elementosRemover = [];
+  var limite = Math.min(body.getNumChildren(), 15);
+  for (var idx = 0; idx < limite; idx++) {
+    var child = body.getChild(idx);
+    var tipo = child.getType();
+    if (tipo === DocumentApp.ElementType.TABLE) {
+      elementosRemover.push(child);
+    } else if (tipo === DocumentApp.ElementType.PARAGRAPH) {
+      var texto = child.asParagraph().getText().trim();
+      // Remover texto de versão "(versão X.X)" e parágrafos vazios antes do conteúdo
+      if (texto.match(/^\(vers/i)) {
+        elementosRemover.push(child);
+      }
+    }
+  }
+  for (var r = 0; r < elementosRemover.length; r++) {
+    try {
+      body.removeChild(elementosRemover[r]);
+      Logger.log('Removido elemento antigo do body: ' + (r + 1));
+    } catch (e) {
+      Logger.log('Aviso ao remover elemento do body: ' + e.message);
+    }
+  }
+
   // Reconstruir cabeçalho no padrão do papel timbrado oficial CAS/DF
   var header = doc.getHeader();
   if (!header) {
