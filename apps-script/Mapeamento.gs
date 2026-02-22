@@ -195,6 +195,7 @@ function gerarSubstituicoes(dados) {
     '{{analise_tecnica}}': dados.analiseTecnica || '(não informado)',
     '{{fundamentos_discordancia}}': dados.fundamentosDiscordancia || 'N/A',
     '{{voto}}': dados.voto || '(não informado)',
-    '{{data_voto}}': formatarData(dados.dataVoto)
+    '{{data_voto}}': formatarData(dados.dataVoto),
+    '{{assinatura_relator}}': dados.conselheiro || '(não informado)'
   };
 }
