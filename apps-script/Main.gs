@@ -188,8 +188,8 @@ function removerTriggers() {
  * Simula uma submissão do formulário
  */
 function testeManual() {
-  // Buscar última resposta da planilha
-  const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
+  // Buscar última resposta da planilha (sempre primeira aba = respostas do Forms)
+  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheets()[0];
   const lastRow = sheet.getLastRow();
 
   if (lastRow < 2) {
