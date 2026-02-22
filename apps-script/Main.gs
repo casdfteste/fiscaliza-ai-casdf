@@ -175,6 +175,102 @@ function instalarTrigger() {
 }
 
 /**
+ * Teste com dados fictícios — não depende de respostas reais no Forms/Planilha.
+ * Cobre todos os campos de Mapeamento.gs, incluindo os campos condicionais.
+ * Ideal para validar o fluxo completo: documento → PDF → email → comprovante.
+ */
+function testeComDadosFicticios() {
+  const nv = function(valor) { return [valor]; };
+
+  const namedValues = {
+    // Identificação
+    'Nome do(a) Conselheiro(a)':                          nv('Maria da Silva Santos'),
+    'E-mail do(a) Conselheiro(a)':                        nv(EMAIL_ADMIN),
+    'Nome da Instituição Fiscalizada':                    nv('APAE - Associação de Pais e Amigos dos Excepcionais'),
+    'Tipo de Processo':                                   nv('Acompanhamento anual'),
+    'Qual o ano do acompanhamento?':                      nv('2025'),
+    'Modalidade da Inscrição':                            nv('Anexo I'),
+    'Nome do Serviço/Oferta Fiscalizada':                 nv('Serviço de Convivência e Fortalecimento de Vínculos'),
+
+    // Endereço
+    'CEP da Entidade':                                    nv('70770-502'),
+    'Número':                                             nv('515'),
+    'Complemento (sala, bloco, andar)':                   nv('Bloco B, 4º andar'),
+
+    // Dados da visita
+    'Data da Visita':                                     nv('22/02/2026'),
+    'Horário da Visita':                                  nv('10:00'),
+    'Quem recebeu o(a) conselheiro(a)?':                  nv('João Pereira da Costa - Diretor Técnico'),
+
+    // Documentação
+    'Licença de Funcionamento ou Laudo Técnico':          nv('Sim, possui licença vigente até 12/2026'),
+    'É executada em unidade pública cedida?':             nv('Não'),
+    'Qual o instrumento jurídico da cessão?':             nv(''),
+
+    // Público-alvo
+    'Públicos Atendidos':                                 nv('Pessoas com deficiência intelectual'),
+    'Se atende IDOSOS - Registro no CDI/DF?':             nv('Não se aplica'),
+    'Se atende CRIANÇAS/ADOLESCENTES - Registro no CDCA/DF?': nv('Não se aplica'),
+    'Se atende FAMÍLIAS - Registros':                     nv(''),
+
+    // Equipe
+    'Formas de Acesso dos Usuários':                      nv('Encaminhamento do CRAS e demanda espontânea'),
+    'Número de Voluntários':                              nv('3'),
+    'Número de Contratados':                              nv('12'),
+    'Especialidades Presentes na Equipe':                 nv('Psicólogo, Assistente Social, Terapeuta Ocupacional, Pedagogo'),
+
+    // Infraestrutura
+    'Tipo de Espaço':                                     nv('Imóvel próprio da entidade'),
+    'Acessibilidade':                                     nv('Rampa de acesso, banheiro adaptado, piso tátil'),
+    'Compartilha Espaço com Outros Serviços?':            nv('Não'),
+    'Quais serviços compartilham o espaço?':              nv(''),
+    'Adequação do Espaço Físico':                         nv('Satisfatório'),
+    'Descreva as inadequações':                           nv(''),
+
+    // Funcionamento
+    'Funciona de dezembro a dezembro (ano todo)?':        nv('Sim'),
+    'Há período de recesso ou férias coletivas?':         nv('Sim'),
+    'Qual o período de recesso/férias?':                  nv('Janeiro - 2 primeiras semanas'),
+    'O serviço é totalmente gratuito?':                   nv('Sim'),
+    'Por que o serviço não é gratuito?':                  nv(''),
+    'Há retenção de BPC?':                                nv('Não'),
+    'Qual o percentual de BPC retido?':                   nv(''),
+
+    // Articulação
+    'Centro de Referência - CRAS':                        nv('Sim - CRAS Asa Norte'),
+    'Centro de Referência Especializado - CREAS':         nv('Sim - CREAS Plano Piloto'),
+    'Unidade de Acolhimento':                             nv('Não'),
+    'Serviço de Abordagem Social':                        nv('Não'),
+    'Centro POP':                                         nv('Não'),
+    'Serviços de Saúde':                                  nv('Sim - UBS 03 de Brasília'),
+    'Serviços de Educação':                               nv('Sim - CED 01 de Brasília'),
+    'Sistema de Justiça':                                 nv('Não'),
+    'Conselhos de Políticas Públicas':                    nv('Sim - CDPD/DF'),
+    'Outras Articulações Relevantes':                     nv('Parceria com Secretaria de Educação para transporte escolar'),
+
+    // Avaliação
+    'As ações executadas estão conforme o Plano de Trabalho?': nv('Sim, em conformidade'),
+    'Descreva as divergências encontradas':               nv(''),
+    'A metodologia está adequada às normativas?':         nv('Sim, metodologia adequada'),
+    'Descreva as inadequações ou ressalvas metodológicas':nv(''),
+    'Observações Adicionais':                             nv('Entidade bem organizada, equipe comprometida e espaço adequado para o atendimento.'),
+
+    // Voto
+    'Quanto às análises técnicas da Secretaria Executiva': nv('Concordo integralmente com as análises técnicas apresentadas'),
+    'Fundamentos da discordância':                        nv(''),
+    'Voto do(a) Conselheiro(a)':                          nv('Deferimento'),
+    'Justificativa do Voto':                              nv('A entidade demonstra plena capacidade técnica e operacional para execução dos serviços.'),
+    'Data do Voto':                                       nv('22/02/2026')
+  };
+
+  Logger.log('=== TESTE COM DADOS FICTÍCIOS ===');
+  Logger.log('Instituição: APAE - SCFV');
+  Logger.log('Conselheiro: Maria da Silva Santos');
+
+  onFormSubmit({ namedValues: namedValues });
+}
+
+/**
  * Remove todos os triggers do projeto
  */
 function removerTriggers() {
