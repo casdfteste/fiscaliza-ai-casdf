@@ -10,10 +10,10 @@
 // ========================================
 
 // Google Forms - Formulário de Fiscalização v9.0
-const FORM_ID = "1qwMKiEYcp9nUGJQZGqBInmXZwbUc4djDC4N2HW37GLg";
+const FORM_ID = "1YvIKUk4J6eyL5btvX6l9VrhlvyOJbhjoKd8CHF-eB6Q";
 
 // Planilha de Respostas
-const SHEET_ID = "1LuF54HNB_VbRlZMEq3-nmx4HfUXosG_ZcGUW1MxPffI";
+const SHEET_ID = "1WSw7yXTT2jhW7IguLeuKqiytAZLzNLe_KP9al7NQkbk";
 
 // Template do Documento
 const TEMPLATE_ID = "1gmdFgJt7KTfDfnh5gXBrv_mKbn8kjETaei_KcBGgYJ4";
@@ -33,6 +33,7 @@ const FOLDER_NAME = "Relatórios CAS-DF 2026";
 
 const IMAGE_MAX_WIDTH = 450;   // pixels (~15cm)
 const IMAGE_MAX_HEIGHT = 300;  // pixels (~10cm)
+const MAX_FOTO_BYTES = 2 * 1024 * 1024; // 2 MB — limite para acionar compressão via thumbnail
 
 // ========================================
 // CONFIGURAÇÕES DE PDF
@@ -54,8 +55,8 @@ const COLOR_CAPTION = "#666666";    // Cinza
 // ========================================
 
 const CAMPOS_FOTO = [
+  '📸 Foto da Fachada/Entrada',
   '📸 Foto da Licença/Laudo (se houver)',
-  '📸 Foto da Fachada/Identificação',
   '📸 Fotos de Acessibilidade',
   '📸 Fotos dos Espaços',
   '📸 Fotos de Atividades',
@@ -435,6 +436,55 @@ function criarTemplateFormatado() {
 }
 
 /**
+ * Compõe endereço completo a partir do CEP via BrasilAPI
+ * @param {string} cep - CEP (com ou sem formatação)
+ * @param {string} numero - Número do endereço
+ * @param {string} complemento - Complemento (sala, bloco, etc.)
+ * @returns {string} Endereço completo formatado
+ */
+function comporEnderecoPorCEP(cep, numero, complemento) {
+  if (!cep) return '(endereço não informado)';
+
+  const cepLimpo = cep.replace(/\D/g, '');
+  if (cepLimpo.length !== 8) {
+    return cep + (numero ? ', ' + numero : '') + (complemento ? ' - ' + complemento : '');
+  }
+
+  const cepFormatado = cepLimpo.replace(/^(\d{5})(\d{3})$/, '$1-$2');
+  const fallback = 'CEP ' + cepFormatado + (numero ? ', ' + numero : '') + (complemento ? ' - ' + complemento : '');
+
+  var apis = [
+    'https://brasilapi.com.br/api/cep/v2/' + cepLimpo,
+    'https://brasilapi.com.br/api/cep/v1/' + cepLimpo
+  ];
+
+  for (var a = 0; a < apis.length; a++) {
+    try {
+      var response = UrlFetchApp.fetch(apis[a], { muteHttpExceptions: true });
+      if (response.getResponseCode() !== 200) continue;
+
+      var dados = JSON.parse(response.getContentText());
+      var partes = [];
+
+      if (dados.street) partes.push(dados.street);
+      if (numero) partes.push(numero);
+      if (complemento) partes.push(complemento);
+      if (dados.neighborhood) partes.push(dados.neighborhood);
+      if (dados.city) partes.push(dados.city + '/' + (dados.state || 'DF'));
+      partes.push('CEP ' + cepFormatado);
+
+      Logger.log('CEP resolvido via ' + apis[a]);
+      return partes.join(', ');
+    } catch (e) {
+      Logger.log('Falha na API ' + apis[a] + ': ' + e.message);
+    }
+  }
+
+  Logger.log('Nenhuma API de CEP respondeu, usando fallback');
+  return fallback;
+}
+
+/**
  * Adiciona campo formatado ao documento
  */
 function addCampo(body, label, placeholder, negrito) {
@@ -585,6 +635,12 @@ function verificarEspaco() {
  * @returns {Object} Dados estruturados
  */
 function mapearCampos(respostas) {
+  // Compor endereço a partir dos campos separados do formulário
+  const cep = obterValor(respostas, 'CEP da Entidade');
+  const numero = obterValor(respostas, 'Número');
+  const complemento = obterValor(respostas, 'Complemento (sala, bloco, andar)');
+  const enderecoCompleto = comporEnderecoPorCEP(cep, numero, complemento);
+
   const dados = {
     // ========================================
     // IDENTIFICAÇÃO
@@ -600,7 +656,7 @@ function mapearCampos(respostas) {
     // ========================================
     // DADOS DA VISITA
     // ========================================
-    endereco: obterValor(respostas, 'Endereço Completo'),
+    endereco: enderecoCompleto,
     dataVisita: obterValor(respostas, 'Data da Visita'),
     horario: obterValor(respostas, 'Horário da Visita'),
     quemRecebeu: obterValor(respostas, 'Quem recebeu o(a) conselheiro(a)?'),
