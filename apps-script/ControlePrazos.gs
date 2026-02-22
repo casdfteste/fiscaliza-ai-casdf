@@ -135,49 +135,6 @@ function enviarRelatorioAtrasados(atrasados) {
 }
 
 /**
- * Atualiza o status do processo quando um relatório é recebido
- * Chamada pelo sistema de fiscalização existente
- * @param {string} entidade - Nome da entidade
- * @param {string} conselheiro - Nome do conselheiro
- * @param {string} linkRelatorio - Link do relatório gerado
- */
-function atualizarStatusRelatorioRecebido(entidade, conselheiro, linkRelatorio) {
-  const sheet = SpreadsheetApp.openById(SHEET_CONTROLE_ID).getSheetByName(ABA_CONTROLE);
-  const dados = sheet.getDataRange().getValues();
-
-  // Procurar o processo correspondente
-  for (let i = 1; i < dados.length; i++) {
-    const linhaEntidade = dados[i][2]; // Coluna C: Entidade
-    const linhaConselheiro = dados[i][3]; // Coluna D: Conselheiro
-    const linhaStatus = dados[i][10]; // Coluna K: Status
-
-    // Encontrar processo designado/aguardando para esta entidade e conselheiro
-    if (linhaEntidade === entidade &&
-        linhaConselheiro === conselheiro &&
-        (linhaStatus === STATUS.DESIGNADO || linhaStatus === STATUS.AGUARDANDO)) {
-
-      const linhaPlanilha = i + 1;
-
-      // Atualizar status
-      sheet.getRange(linhaPlanilha, 11).setValue(STATUS.RECEBIDO); // K: Status
-
-      // Registrar data do relatório
-      const dataAtual = Utilities.formatDate(new Date(), 'America/Sao_Paulo', 'dd/MM/yyyy');
-      sheet.getRange(linhaPlanilha, 12).setValue(dataAtual); // L: Data Relatório
-
-      // Registrar link do relatório
-      sheet.getRange(linhaPlanilha, 14).setValue(linkRelatorio); // N: Link Relatório
-
-      Logger.log('✅ Status atualizado para RECEBIDO: ' + entidade);
-      return true;
-    }
-  }
-
-  Logger.log('⚠️ Processo não encontrado para: ' + entidade + ' / ' + conselheiro);
-  return false;
-}
-
-/**
  * Marca um processo como concluído
  * @param {number} linha - Número da linha na planilha
  */
