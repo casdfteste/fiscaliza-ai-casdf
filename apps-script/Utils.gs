@@ -278,6 +278,7 @@ function criarTemplateFormatado() {
   addCampo(body, 'INSTITUIÇÃO:', '{{instituicao}}', true);
   addCampo(body, 'ASSUNTO:', '{{assunto_tipo}}', true);
   addCampo(body, 'MODALIDADE:', '{{modalidade}}', true);
+  addCampo(body, 'Ano do acompanhamento:', '{{ano_acompanhamento}}', false);
 
   body.appendHorizontalRule();
 
@@ -294,6 +295,7 @@ function criarTemplateFormatado() {
   addCampoNumerado(body, '5', 'Quem recebeu o conselheiro:', '{{quem_recebeu}}');
   addCampoNumerado(body, '6', 'Licença/Laudo:', '{{licenca}}');
   addCampo(body, 'Unidade pública:', '{{unidade_publica}}', false);
+  addCampo(body, 'Instrumento jurídico da cessão:', '{{instrumento_cessao}}', false);
 
   body.appendHorizontalRule();
 
@@ -303,8 +305,10 @@ function criarTemplateFormatado() {
   secao2.setBold(true);
   secao2.setForegroundColor('#283593');
 
-  addCampoNumerado(body, '7', 'Registro CDI/DF (idosos):', '{{registro_cdi}}');
-  addCampo(body, 'Registro CDCA/DF (crianças):', '{{registro_cdca}}', false);
+  addCampoNumerado(body, '7', 'Públicos atendidos:', '{{publicos_atendidos}}');
+  addCampo(body, 'Registro CDI/DF (idosos):', '{{registro_cdi}}', false);
+  addCampo(body, 'Registro CDCA/DF (crianças/adolescentes):', '{{registro_cdca}}', false);
+  addCampo(body, 'Registros (famílias):', '{{registros_familias}}', false);
 
   body.appendHorizontalRule();
 
@@ -330,7 +334,9 @@ function criarTemplateFormatado() {
   addCampoNumerado(body, '11', 'Tipo de espaço:', '{{tipo_espaco}}');
   addCampo(body, 'Acessibilidade:', '{{acessibilidade}}', false);
   addCampo(body, 'Compartilha espaço:', '{{compartilha_espaco}}', false);
+  addCampo(body, 'Serviços que compartilham:', '{{servicos_compartilhados}}', false);
   addCampo(body, 'Espaço satisfatório:', '{{espaco_satisfatorio}}', false);
+  addCampo(body, 'Inadequações do espaço:', '{{inadequacoes_espaco}}', false);
 
   body.appendHorizontalRule();
 
@@ -342,8 +348,11 @@ function criarTemplateFormatado() {
 
   addCampoNumerado(body, '12', 'Dezembro a dezembro:', '{{dezembro_dezembro}}');
   addCampo(body, 'Recesso/férias:', '{{recesso}}', false);
+  addCampo(body, 'Período de recesso:', '{{periodo_recesso}}', false);
   addCampoNumerado(body, '13', 'Gratuidade:', '{{gratuidade}}');
+  addCampo(body, 'Justificativa (não gratuito):', '{{justificativa_nao_gratuito}}', false);
   addCampo(body, 'BPC:', '{{bpc}}', false);
+  addCampo(body, 'Percentual de BPC retido:', '{{percentual_bpc}}', false);
 
   body.appendHorizontalRule();
 
@@ -353,9 +362,21 @@ function criarTemplateFormatado() {
   secao6.setBold(true);
   secao6.setForegroundColor('#283593');
 
-  addCampoNumerado(body, '14', 'Articulação com a rede:', '{{articulacao}}');
+  addCampoNumerado(body, '14', 'Articulação com a rede:', '');
+  addCampo(body, '  • CRAS:', '{{articulacao_cras}}', false);
+  addCampo(body, '  • CREAS:', '{{articulacao_creas}}', false);
+  addCampo(body, '  • Unidade de Acolhimento:', '{{articulacao_acolhimento}}', false);
+  addCampo(body, '  • Abordagem Social:', '{{articulacao_abordagem}}', false);
+  addCampo(body, '  • Centro POP:', '{{articulacao_pop}}', false);
+  addCampo(body, '  • Saúde:', '{{articulacao_saude}}', false);
+  addCampo(body, '  • Educação:', '{{articulacao_educacao}}', false);
+  addCampo(body, '  • Sistema de Justiça:', '{{articulacao_justica}}', false);
+  addCampo(body, '  • Conselhos de Políticas Públicas:', '{{articulacao_conselhos}}', false);
+  addCampo(body, '  • Outras articulações:', '{{articulacao}}', false);
   addCampoNumerado(body, '15', 'Ações conforme plano:', '{{acoes_plano}}');
+  addCampo(body, 'Divergências em relação ao plano:', '{{divergencias_plano}}', false);
   addCampoNumerado(body, '16', 'Metodologia adequada:', '{{metodologia}}');
+  addCampo(body, 'Inadequações metodológicas:', '{{inadequacoes_metodologia}}', false);
   addCampoNumerado(body, '17', 'Observações:', '{{observacoes}}');
 
   body.appendHorizontalRule();
@@ -377,6 +398,7 @@ function criarTemplateFormatado() {
   addCampo(body, '2. O(A) Conselheiro(a) vota pelo(a):', '', true);
   const voto = body.appendParagraph('{{voto}}');
   voto.setBold(true);
+  addCampo(body, 'Justificativa do voto:', '{{justificativa_voto}}', false);
   body.appendParagraph('');
 
   const deliberacao = body.appendParagraph('Seja o presente voto submetido à deliberação da plenária.');
