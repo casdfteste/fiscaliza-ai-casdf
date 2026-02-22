@@ -43,6 +43,7 @@ const FOLDER_NAME = "Relatórios CAS-DF 2026";
 
 const IMAGE_MAX_WIDTH = 450;   // pixels (~15cm)
 const IMAGE_MAX_HEIGHT = 300;  // pixels (~10cm)
+const MAX_FOTO_BYTES = 2 * 1024 * 1024; // 2 MB — limite para acionar compressão via thumbnail
 
 // ========================================
 // CONFIGURAÇÕES DE PDF

@@ -11,6 +11,12 @@
  * @returns {Object} Dados estruturados
  */
 function mapearCampos(respostas) {
+  // Compor endereço a partir dos campos separados do formulário
+  const cep = obterValor(respostas, 'CEP da Entidade');
+  const numero = obterValor(respostas, 'Número');
+  const complemento = obterValor(respostas, 'Complemento (sala, bloco, andar)');
+  const enderecoCompleto = comporEnderecoPorCEP(cep, numero, complemento);
+
   const dados = {
     // ========================================
     // IDENTIFICAÇÃO
@@ -26,7 +32,7 @@ function mapearCampos(respostas) {
     // ========================================
     // DADOS DA VISITA
     // ========================================
-    endereco: obterValor(respostas, 'Endereço Completo'),
+    endereco: enderecoCompleto,
     dataVisita: obterValor(respostas, 'Data da Visita'),
     horario: obterValor(respostas, 'Horário da Visita'),
     quemRecebeu: obterValor(respostas, 'Quem recebeu o(a) conselheiro(a)?'),
