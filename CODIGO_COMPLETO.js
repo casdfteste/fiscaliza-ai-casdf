@@ -55,12 +55,12 @@ const COLOR_CAPTION = "#666666";    // Cinza
 // ========================================
 
 const CAMPOS_FOTO = [
-  '📸 Foto da Fachada/Entrada',
-  '📸 Foto da Licença/Laudo (se houver)',
-  '📸 Fotos de Acessibilidade',
-  '📸 Fotos dos Espaços',
-  '📸 Fotos de Atividades',
-  '📸 Fotos Adicionais'
+  'Foto da Fachada/Entrada',
+  'Foto da Licença/Laudo (se houver)',
+  'Fotos de Acessibilidade',
+  'Fotos dos Espaços',
+  'Fotos de Atividades',
+  'Fotos Adicionais'
 ];
 /**
  * SISTEMA DE AUTOMAÇÃO DE FISCALIZAÇÃO CAS/DF

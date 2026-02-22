@@ -92,9 +92,9 @@ function buscarEmailConselheiro(nomeConselheiro) {
 
   // Pula o cabeçalho (linha 0)
   for (let i = 1; i < dados.length; i++) {
-    const nome = dados[i][0]; // Coluna A: Nome
-    const email = dados[i][1]; // Coluna B: E-mail
-    const status = dados[i][3]; // Coluna D: Status
+    const nome = dados[i][0];   // Coluna A: Nome Completo
+    const email = dados[i][2];  // Coluna C: E-mail
+    const status = dados[i][9]; // Coluna J: Status
 
     if (nome === nomeConselheiro && status === 'Ativo') {
       return email;

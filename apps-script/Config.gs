@@ -72,10 +72,10 @@ const RECIBO_PROPERTY_KEY = 'recibo_contador';
 // ========================================
 
 const CAMPOS_FOTO = [
-  '📸 Foto da Fachada/Entrada',
-  '📸 Foto da Licença/Laudo (se houver)',
-  '📸 Fotos de Acessibilidade',
-  '📸 Fotos dos Espaços',
-  '📸 Fotos de Atividades',
-  '📸 Fotos Adicionais'
+  'Foto da Fachada/Entrada',
+  'Foto da Licença/Laudo (se houver)',
+  'Fotos de Acessibilidade',
+  'Fotos dos Espaços',
+  'Fotos de Atividades',
+  'Fotos Adicionais'
 ];
