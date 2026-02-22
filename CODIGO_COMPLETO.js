@@ -575,7 +575,34 @@ function gerarSubstituicoes(dados) {
     '{{fundamentos_discordancia}}': dados.fundamentosDiscordancia || 'N/A',
     '{{voto}}': dados.voto || '(não informado)',
     '{{data_voto}}': formatarData(dados.dataVoto),
-    '{{assinatura_relator}}': dados.conselheiro || '(não informado)'
+    '{{assinatura_relator}}': dados.conselheiro || '(não informado)',
+
+    // ─── Campos condicionais/complementares ───
+    '{{ano_acompanhamento}}': dados.anoAcompanhamento || '(não informado)',
+    '{{instrumento_cessao}}': dados.instrumentoCessao || 'N/A',
+    '{{publicos_atendidos}}': dados.publicosAtendidos || '(não informado)',
+    '{{registros_familias}}': dados.registrosFamilias || 'N/A',
+    '{{servicos_compartilhados}}': dados.servicosCompartilhados || 'N/A',
+    '{{inadequacoes_espaco}}': dados.inadequacoesEspaco || 'N/A',
+    '{{periodo_recesso}}': dados.periodoRecesso || 'N/A',
+    '{{justificativa_nao_gratuito}}': dados.justificativaNaoGratuito || 'N/A',
+    '{{percentual_bpc}}': dados.percentualBPC || 'N/A',
+
+    // ─── Articulações individuais ───
+    '{{articulacao_cras}}': dados.articulacaoCRAS || 'N/A',
+    '{{articulacao_creas}}': dados.articulacaoCREAS || 'N/A',
+    '{{articulacao_acolhimento}}': dados.articulacaoAcolhimento || 'N/A',
+    '{{articulacao_abordagem}}': dados.articulacaoAbordagem || 'N/A',
+    '{{articulacao_pop}}': dados.articulacaoPOP || 'N/A',
+    '{{articulacao_saude}}': dados.articulacaoSaude || 'N/A',
+    '{{articulacao_educacao}}': dados.articulacaoEducacao || 'N/A',
+    '{{articulacao_justica}}': dados.articulacaoJustica || 'N/A',
+    '{{articulacao_conselhos}}': dados.articulacaoConselhos || 'N/A',
+
+    // ─── Complementos de avaliação ───
+    '{{divergencias_plano}}': dados.divergenciasPlano || 'N/A',
+    '{{inadequacoes_metodologia}}': dados.inadequacoesMetodologia || 'N/A',
+    '{{justificativa_voto}}': dados.justificativaVoto || 'N/A'
   };
 }
 /**

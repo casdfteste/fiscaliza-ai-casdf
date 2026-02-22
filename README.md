@@ -126,7 +126,7 @@ O template usa os seguintes placeholders:
 | `{{recesso}}` | Período de recesso |
 | `{{gratuidade}}` | Serviço gratuito? |
 | `{{bpc}}` | Retenção de BPC |
-| `{{articulacao}}` | Articulações com a rede |
+| `{{articulacao}}` | Articulações com a rede (campo livre) |
 | `{{acoes_plano}}` | Ações conforme plano |
 | `{{metodologia}}` | Metodologia adequada? |
 | `{{observacoes}}` | Observações adicionais |
@@ -135,6 +135,27 @@ O template usa os seguintes placeholders:
 | `{{voto}}` | Voto do(a) conselheiro(a) |
 | `{{data_voto}}` | Data do voto |
 | `{{assinatura_relator}}` | Nome do(a) conselheiro(a) relator(a) |
+| `{{ano_acompanhamento}}` | Ano do acompanhamento |
+| `{{instrumento_cessao}}` | Instrumento jurídico da cessão de espaço |
+| `{{publicos_atendidos}}` | Públicos atendidos pela entidade |
+| `{{registros_familias}}` | Registros para famílias (SUAS, CadÚnico etc.) |
+| `{{servicos_compartilhados}}` | Serviços que compartilham o espaço |
+| `{{inadequacoes_espaco}}` | Descrição das inadequações do espaço |
+| `{{periodo_recesso}}` | Período de recesso/férias coletivas |
+| `{{justificativa_nao_gratuito}}` | Justificativa para serviço não gratuito |
+| `{{percentual_bpc}}` | Percentual de BPC retido |
+| `{{articulacao_cras}}` | Articulação com CRAS |
+| `{{articulacao_creas}}` | Articulação com CREAS |
+| `{{articulacao_acolhimento}}` | Articulação com Unidade de Acolhimento |
+| `{{articulacao_abordagem}}` | Articulação com Serviço de Abordagem Social |
+| `{{articulacao_pop}}` | Articulação com Centro POP |
+| `{{articulacao_saude}}` | Articulação com Serviços de Saúde |
+| `{{articulacao_educacao}}` | Articulação com Serviços de Educação |
+| `{{articulacao_justica}}` | Articulação com Sistema de Justiça |
+| `{{articulacao_conselhos}}` | Articulação com Conselhos de Políticas Públicas |
+| `{{divergencias_plano}}` | Divergências em relação ao plano de trabalho |
+| `{{inadequacoes_metodologia}}` | Inadequações ou ressalvas metodológicas |
+| `{{justificativa_voto}}` | Justificativa do voto |
 
 ### Passo 3: Criar o Projeto no Apps Script
 
